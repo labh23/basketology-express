@@ -4,41 +4,52 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, PlaneLanding, PlaneTakeoff, Search } from "lucide-react";
+import { Calendar as CalendarIcon, Search } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import FlightCard from "@/components/FlightCard";
+import { useQuery } from "@tanstack/react-query";
+import { searchFlights, type FlightOffer } from "../services/flightService";
+import { useToast } from "@/components/ui/use-toast";
 
 const Index = () => {
+  const [origin, setOrigin] = useState<string>("");
+  const [destination, setDestination] = useState<string>("");
   const [date, setDate] = useState<Date>();
-  const [searchResults, setSearchResults] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const { toast } = useToast();
 
-  const handleSearch = () => {
-    setSearchResults(true);
+  const { data: flights, refetch, isLoading } = useQuery({
+    queryKey: ['flights', origin, destination, date],
+    queryFn: () => searchFlights(
+      origin,
+      destination,
+      date ? format(date, 'yyyy-MM-dd') : ''
+    ),
+    enabled: false,
+  });
+
+  const handleSearch = async () => {
+    if (!origin || !destination || !date) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all search fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      await refetch();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to search flights. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
-
-  const mockFlights = [
-    {
-      id: 1,
-      airline: "SkyWings Airlines",
-      departure: "New York (JFK)",
-      arrival: "London (LHR)",
-      price: 549,
-      duration: "7h 20m",
-      departureTime: "08:00 AM",
-      arrivalTime: "3:20 PM",
-    },
-    {
-      id: 2,
-      airline: "Global Airways",
-      departure: "New York (JFK)",
-      arrival: "London (LHR)",
-      price: 489,
-      duration: "7h 45m",
-      departureTime: "10:30 AM",
-      arrivalTime: "6:15 PM",
-    },
-  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
@@ -56,30 +67,22 @@ const Index = () => {
         <div className="bg-white rounded-xl shadow-lg p-6 grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="space-y-2">
             <label className="text-sm font-medium">From</label>
-            <Select>
-              <SelectTrigger>
-                <SelectValue placeholder="Select departure" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="nyc">New York (JFK)</SelectItem>
-                <SelectItem value="lax">Los Angeles (LAX)</SelectItem>
-                <SelectItem value="lon">London (LHR)</SelectItem>
-              </SelectContent>
-            </Select>
+            <Input 
+              placeholder="Airport code (e.g., JFK)" 
+              value={origin}
+              onChange={(e) => setOrigin(e.target.value.toUpperCase())}
+              maxLength={3}
+            />
           </div>
 
           <div className="space-y-2">
             <label className="text-sm font-medium">To</label>
-            <Select>
-              <SelectTrigger>
-                <SelectValue placeholder="Select destination" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="lon">London (LHR)</SelectItem>
-                <SelectItem value="par">Paris (CDG)</SelectItem>
-                <SelectItem value="tok">Tokyo (HND)</SelectItem>
-              </SelectContent>
-            </Select>
+            <Input 
+              placeholder="Airport code (e.g., LHR)"
+              value={destination}
+              onChange={(e) => setDestination(e.target.value.toUpperCase())}
+              maxLength={3}
+            />
           </div>
 
           <div className="space-y-2">
@@ -103,28 +106,48 @@ const Index = () => {
                   selected={date}
                   onSelect={setDate}
                   initialFocus
+                  disabled={(date) => date < new Date()}
                 />
               </PopoverContent>
             </Popover>
           </div>
 
           <div className="flex items-end">
-            <Button onClick={handleSearch} className="w-full bg-primary hover:bg-primary/90">
-              <Search className="mr-2 h-4 w-4" /> Search Flights
+            <Button 
+              onClick={handleSearch} 
+              className="w-full" 
+              disabled={isLoading}
+            >
+              {isLoading ? "Searching..." : (
+                <>
+                  <Search className="mr-2 h-4 w-4" /> Search Flights
+                </>
+              )}
             </Button>
           </div>
         </div>
       </div>
 
       {/* Search Results */}
-      {searchResults && (
+      {isSearching && (
         <div className="max-w-6xl mx-auto mt-12 px-4 space-y-6">
           <h2 className="text-2xl font-semibold">Available Flights</h2>
-          <div className="space-y-4">
-            {mockFlights.map((flight) => (
-              <FlightCard key={flight.id} flight={flight} />
-            ))}
-          </div>
+          {isLoading ? (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+              <p className="mt-4 text-gray-600">Searching for the best flights...</p>
+            </div>
+          ) : flights && flights.length > 0 ? (
+            <div className="space-y-4">
+              {flights.map((flight) => (
+                <FlightCard key={flight.id} flight={flight} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-gray-600">No flights found for your search criteria.</p>
+            </div>
+          )}
         </div>
       )}
 
