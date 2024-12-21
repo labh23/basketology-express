@@ -1,8 +1,16 @@
 import Amadeus from 'amadeus';
 
+const clientId = import.meta.env.VITE_AMADEUS_CLIENT_ID;
+const clientSecret = import.meta.env.VITE_AMADEUS_CLIENT_SECRET;
+
+if (!clientId || !clientSecret) {
+  console.error('Missing Amadeus API credentials. Please set VITE_AMADEUS_CLIENT_ID and VITE_AMADEUS_CLIENT_SECRET environment variables.');
+}
+
 const amadeus = new Amadeus({
-  clientId: import.meta.env.VITE_AMADEUS_CLIENT_ID,
-  clientSecret: import.meta.env.VITE_AMADEUS_CLIENT_SECRET
+  clientId,
+  clientSecret,
+  hostname: 'test' // Use the test environment
 });
 
 export interface FlightOffer {
