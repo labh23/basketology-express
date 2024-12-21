@@ -1,8 +1,8 @@
 import Amadeus from 'amadeus';
 
 const amadeus = new Amadeus({
-  clientId: process.env.AMADEUS_CLIENT_ID,
-  clientSecret: process.env.AMADEUS_CLIENT_SECRET
+  clientId: import.meta.env.VITE_AMADEUS_CLIENT_ID,
+  clientSecret: import.meta.env.VITE_AMADEUS_CLIENT_SECRET
 });
 
 export interface FlightOffer {

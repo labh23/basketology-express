@@ -4,7 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Search } from "lucide-react";
+import { Calendar as CalendarIcon, Search, PlaneTakeoff as PlaneTakeoffIcon, PlaneLanding as PlaneLandingIcon } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import FlightCard from "@/components/FlightCard";
@@ -157,14 +157,14 @@ const Index = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="text-center p-6 rounded-lg bg-white shadow-md hover:shadow-lg transition-shadow">
             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <PlaneTakeoff className="h-8 w-8 text-primary" />
+              <PlaneTakeoffIcon className="h-8 w-8 text-primary" />
             </div>
             <h3 className="text-xl font-semibold mb-2">Best Prices</h3>
             <p className="text-gray-600">Find the most competitive prices for your flights</p>
           </div>
           <div className="text-center p-6 rounded-lg bg-white shadow-md hover:shadow-lg transition-shadow">
             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <PlaneLanding className="h-8 w-8 text-primary" />
+              <PlaneLandingIcon className="h-8 w-8 text-primary" />
             </div>
             <h3 className="text-xl font-semibold mb-2">24/7 Support</h3>
             <p className="text-gray-600">Our support team is always here to help you</p>

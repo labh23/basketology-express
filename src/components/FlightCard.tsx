@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { PlaneLanding, PlaneTakeoff } from "lucide-react";
+import { PlaneLanding as PlaneLandingIcon, PlaneTakeoff as PlaneTakeoffIcon } from "lucide-react";
 
 interface FlightCardProps {
   flight: {
@@ -25,14 +25,14 @@ const FlightCard = ({ flight }: FlightCardProps) => {
 
         <div className="space-y-2">
           <div className="flex items-center space-x-2">
-            <PlaneTakeoff className="h-4 w-4 text-primary" />
+            <PlaneTakeoffIcon className="h-4 w-4 text-primary" />
             <div>
               <p className="font-medium">{flight.departureTime}</p>
               <p className="text-sm text-gray-500">{flight.departure}</p>
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <PlaneLanding className="h-4 w-4 text-primary" />
+            <PlaneLandingIcon className="h-4 w-4 text-primary" />
             <div>
               <p className="font-medium">{flight.arrivalTime}</p>
               <p className="text-sm text-gray-500">{flight.arrival}</p>
